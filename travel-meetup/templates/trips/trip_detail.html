@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ trip.destination }} - Travel Meetup{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Main Trip Details -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                {% if trip.image %}
+                <img src="{{ trip.image.url }}" class="card-img-top" alt="{{ trip.destination }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ trip.destination }}</h1>
+                    <h6 class="card-subtitle mb-3 text-muted">
+                        {{ trip.start_date|date:"F d, Y" }} - {{ trip.end_date|date:"F d, Y" }}
+                    </h6>
+                    
+                    <div class="mb-4">
+                        <h5>Trip Details</h5>
+                        <p class="card-text">{{ trip.description|linebreaks }}</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Posted by {{ trip.creator.username }} on {{ trip.created_at|date:"F d, Y" }}</small>
+                        {% if trip.creator == user %}
+                        <div>
+                            <a href="{% url 'trip-update' trip.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'trip-delete' trip.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Participants Section -->
+            <!-- <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Participants</h5>
+                    {% if trip.participants.all %}
+                        <ul class="list-group">
+                            {% for participant in trip.participants.all %}
+                                <li class="list-group-item">
+                                    <img src="{{ participant.profile.image.url }}" alt="{{ participant.username }}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                    {{ participant.username }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No participants yet. Be the first to join!</p>
+                    {% endif %}
+                </div>
+            </div> -->
+
+            <!-- Join/Leave Trip -->
+            <!-- {% if user.is_authenticated and user != trip.creator %}
+                <form method="POST" action="{% url 'trip-detail' trip.id %}">
+                    {% csrf_token %}
+                    {% if user in trip.participants.all %}
+                        <button type="submit" class="btn btn-danger">Leave Trip</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Join Trip</button>
+                    {% endif %}
+                </form>
+            {% endif %} -->
+        </div>
+
+        <!-- Trip Creator Info -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About the Trip Creator</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ trip.creator.profile.image.url }}" alt="{{ trip.creator.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">{{ trip.creator.username }}</h6>
+                            <small class="text-muted">Member since {{ trip.creator.date_joined|date:"F Y" }}</small>
+                        </div>
+                    </div>
+                    {% if trip.creator.profile.bio %}
+                    <p class="card-text">{{ trip.creator.profile.bio|truncatechars:150 }}</p>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user != trip.creator %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'send-message' trip.creator.username %}" class="btn btn-primary">
+                            <i class="fas fa-envelope me-1"></i> Contact About Trip
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Inbox - Travel Meetup{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">
+    Inbox
+    {% if unread_count %}
+    <span class="badge bg-danger">{{ unread_count }}</span>
+    {% endif %}
+</h1>
+
+{% if conversations %}
+<div class="list-group">
+    {% for conversation in conversations %}
+        {% with other_user=conversation.participants.exclude.0 %}
+        <a href="{% url 'conversation-detail' conversation.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="{{ other_user.profile.image.url }}" alt="{{ other_user.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div>
+                        <h5 class="mb-1">{{ other_user.username }}</h5>
+                        {% with last_message=conversation.message_set.first %}
+                            {% if last_message %}
+                            <p class="mb-1 text-muted">
+                                {% if last_message.sender == user %}You: {% endif %}
+                                {{ last_message.content|truncatechars:50 }}
+                            </p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+                <div>
+                    <small class="text-muted">{{ conversation.updated_at|date:"M d, Y" }}</small>
+                    {% with unread=conversation.message_set.filter.count %}
+                        {% if unread > 0 %}
+                        <span class="badge bg-primary rounded-pill">{{ unread }}</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </a>
+        {% endwith %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>You don't have any conversations yet.</p>
+    <p>Browse trips and contact other travelers to start a conversation!</p>
+    <a href="{% url 'trip-list' %}" class="btn btn-primary">Browse Trips</a>
+</div>
+{% endif %}
+{% endblock %}
+

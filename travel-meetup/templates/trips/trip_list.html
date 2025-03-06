@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Browse Trips - Travel Meetup{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Browse Trips</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Search Trips</h5>
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                {{ search_form.destination|as_crispy_field }}
+            </div>
+            <div class="col-md-3">
+                {{ search_form.start_date|as_crispy_field }}
+            </div>
+            <div class="col-md-3">
+                {{ search_form.end_date|as_crispy_field }}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for trip in trips %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 trip-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ trip.destination }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    {{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}
+                </h6>
+                <p class="card-text">{{ trip.description|truncatechars:100 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Posted by {{ trip.creator.username }}</small>
+                    <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <p>No trips found matching your criteria.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="pagination justify-content-center">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-primary mx-1" href="?page=1{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">First</a>
+            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.previous_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Previous</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a class="btn btn-primary mx-1" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a class="btn btn-outline-primary mx-1" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.next_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Next</a>
+            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Last</a>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+

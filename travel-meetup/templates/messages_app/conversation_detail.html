@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Conversation with {{ other_user.username }} - Travel Meetup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .message {
+        border-radius: 1rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        max-width: 75%;
+    }
+    .message-sent {
+        background-color: #007bff;
+        color: white;
+        margin-left: auto;
+    }
+    .message-received {
+        background-color: #f1f1f1;
+    }
+    .message-time {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-light">
+        <div class="d-flex align-items-center">
+            <a href="{% url 'inbox' %}" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <img src="{{ other_user.profile.image.url }}" alt="{{ other_user.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            <h5 class="mb-0">{{ other_user.username }}</h5>
+        </div>
+    </div>
+    
+    <div class="card-body message-container" id="messageContainer">
+        {% if messages_list %}
+            {% for message in messages_list %}
+                <div class="d-flex {% if message.sender == user %}justify-content-end{% endif %}">
+                    <div class="message {% if message.sender == user %}message-sent{% else %}message-received{% endif %}">
+                        {{ message.content|linebreaks }}
+                        <div class="message-time text-end {% if message.sender == user %}text-light{% else %}text-muted{% endif %}">
+                            {{ message.timestamp|date:"M d, g:i a" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted py-4">
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="card-footer bg-light">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-1"></i> Send
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll to bottom of message container on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const messageContainer = document.getElementById('messageContainer');
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    });
+</script>
+{% endblock %}
+

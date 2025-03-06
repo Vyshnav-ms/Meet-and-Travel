@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Trip{% else %}Create Trip{% endif %} - Travel Meetup
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    {% if form.instance.pk %}Edit Trip{% else %}Create New Trip{% endif %}
+                </h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% if form.instance.pk %}{% url 'trip-detail' form.instance.pk %}{% else %}{% url 'trip-list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Update Trip{% else %}Create Trip{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
