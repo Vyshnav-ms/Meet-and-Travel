@@ -2,23 +2,103 @@
 
 {% block title %}Delete Trip - Travel Meetup{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Confirmation Card */
+    .confirm-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    .confirm-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .confirm-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Buttons */
+    .btn-cancel, .btn-delete {
+        transition: all 0.3s ease;
+        padding: 0.5rem 1.5rem;
+    }
+    .btn-cancel:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: scale(1.05);
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    .btn-delete:hover {
+        background-color: #b02a37;
+        transform: scale(1.05);
+    }
+
+    /* General */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+    }
+    p {
+        font-size: 1.1rem;
+        color: #495057;
+    }
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body text-center">
-                <h2 class="card-title mb-4">Delete Trip</h2>
-                <p>Are you sure you want to delete the trip to <strong>{{ object.destination }}</strong>?</p>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="{% url 'trip-detail' object.id %}" class="btn btn-outline-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    </div>
-                </form>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card confirm-card">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">Delete Trip</h2>
+                    <p>Are you sure you want to delete the trip to <strong>{{ object.destination }}</strong>?</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'trip-detail' object.id %}" class="btn btn-outline-secondary btn-cancel">Cancel</a>
+                            <button type="submit" class="btn btn-danger btn-delete">Yes, Delete</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in confirmation card
+        const confirmCard = document.querySelector('.confirm-card');
+        setTimeout(() => {
+            confirmCard.classList.add('visible');
+        }, 100);
+
+        // Bounce effect on buttons
+        const buttons = document.querySelectorAll('.btn-cancel, .btn-delete');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

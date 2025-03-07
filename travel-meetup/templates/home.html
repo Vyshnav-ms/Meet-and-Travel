@@ -2,36 +2,114 @@
 
 {% block title %}Travel Meetup - Find Travel Companions{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #007bff, #00c4cc);
+        color: white;
+        border-radius: 20px;
+        padding: 4rem 2rem;
+        margin: 3rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+    .hero-section.visible {
+        opacity: 1;
+    }
+    .hero-btn {
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .hero-btn:hover {
+        transform: scale(1.1);
+        background-color: #0056b3; /* Darker shade for primary */
+    }
+    .hero-btn-outline:hover {
+        transform: scale(1.1);
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+
+    /* Trip Cards */
+    .trip-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    .trip-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .trip-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+    .card-btn {
+        transition: all 0.3s ease;
+    }
+    .card-btn:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* General */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+    }
+    .view-all-btn {
+        transition: transform 0.3s ease;
+    }
+    .view-all-btn:hover {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">Find Travel Companions</h1>
+<!-- Hero Section -->
+<div class="px-4 py-5 text-center hero-section">
+    <h1 class="display-5 fw-bold">Find Travel Companions</h1>
     <div class="col-lg-6 mx-auto">
         <p class="lead mb-4">
             Connect with fellow travelers, share your trip plans, and find companions for your next adventure.
         </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a href="{% url 'trip-list' %}" class="btn btn-primary btn-lg px-4 gap-3">Browse Trips</a>
+            <a href="{% url 'trip-list' %}" class="btn btn-primary btn-lg px-4 hero-btn">Browse Trips</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'trip-create' %}" class="btn btn-outline-secondary btn-lg px-4">Create Trip</a>
+                <a href="{% url 'trip-create' %}" class="btn btn-outline-light btn-lg px-4 hero-btn hero-btn-outline">Create Trip</a>
             {% else %}
-                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-lg px-4">Join Now</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4 hero-btn hero-btn-outline">Join Now</a>
             {% endif %}
         </div>
     </div>
 </div>
 
+<!-- Featured Trips -->
 <div class="container">
-    <h2 class="text-center mb-4">Featured Trips</h2>
+    <h2 class="text-center mb-5">Featured Trips</h2>
 
     <div class="row">
         {% for trip in trips %}
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 trip-card">
                 {% if trip.image %}
                     <img src="{{ trip.image.url }}" class="card-img-top" alt="{{ trip.destination }}">
+                {% else %}
+                    <div class="bg-light text-center py-5">
+                        <p class="text-muted mb-0">No image available</p>
+                    </div>
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ trip.destination }}</h5>
+                    <h5 class="card-title text-primary">{{ trip.destination }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">
                         {{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}
                     </h6>
@@ -41,20 +119,52 @@
                     </p>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">Posted by {{ trip.creator.username }}</small>
-                        <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary card-btn">View Details</a>
                     </div>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center">
-            <p>No trips available at the moment.</p>
+            <p class="text-muted">No trips available at the moment.</p>
         </div>
         {% endfor %}
     </div>
 
     <div class="text-center mt-4">
-        <a href="{% url 'trip-list' %}" class="btn btn-outline-primary">View All Trips</a>
+        <a href="{% url 'trip-list' %}" class="btn btn-outline-primary view-all-btn">View All Trips</a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade in hero section
+        const hero = document.querySelector('.hero-section');
+        setTimeout(() => {
+            hero.classList.add('visible');
+        }, 100);
+
+        // Slide in trip cards
+        const tripCards = document.querySelectorAll('.trip-card');
+        tripCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('visible');
+            }, index * 200); // Staggered effect
+        });
+
+        // Bounce effect on hero buttons on hover
+        const heroButtons = document.querySelectorAll('.hero-btn');
+        heroButtons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.1) translateY(-5px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
 {% endblock %}

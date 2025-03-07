@@ -3,37 +3,149 @@
 
 {% block title %}Profile - Travel Meetup{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Profile Card */
+    .profile-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .profile-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .profile-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+    .profile-img {
+        transition: transform 0.3s ease;
+    }
+    .profile-card:hover .profile-img {
+        transform: scale(1.05);
+    }
+
+    /* Edit Card */
+    .edit-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .edit-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .edit-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Button */
+    .btn-update {
+        transition: all 0.3s ease;
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 0.75rem 1.5rem;
+    }
+    .btn-update:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Typography */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+    }
+    h3 {
+        color: #343a40;
+        font-weight: 600;
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+    p {
+        color: #495057;
+    }
+
+    /* General */
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <img class="rounded-circle img-fluid mb-3" src="{{ user.profile.image.url }}" style="width: 150px; height: 150px; object-fit: cover;">
-                <h2 class="card-title">{{ user.username }}</h2>
-                <p class="text-muted">{{ user.email }}</p>
-                {% if user.profile.bio %}
-                <p>{{ user.profile.bio }}</p>
-                {% endif %}
+<div class="container">
+    <div class="row">
+        <!-- Profile Info -->
+        <div class="col-md-4 mb-4">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    <img class="rounded-circle img-fluid mb-3 profile-img" src="{{ user.profile.image.url }}" alt="{{ user.username }}" style="width: 150px; height: 150px; object-fit: cover;">
+                    <h2 class="card-title">{{ user.username }}</h2>
+                    <p class="text-muted">{{ user.email }}</p>
+                    {% if user.profile.bio %}
+                    <p>{{ user.profile.bio }}</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title mb-3">Edit Profile</h3>
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <fieldset class="form-group">
-                        {{ u_form|crispy }}
-                        {{ p_form|crispy }}
-                    </fieldset>
-                    <div class="form-group">
-                        <button class="btn btn-primary" type="submit">Update</button>
-                    </div>
-                </form>
+
+        <!-- Edit Profile Form -->
+        <div class="col-md-8">
+            <div class="card edit-card">
+                <div class="card-body">
+                    <h3 class="card-title mb-3">Edit Profile</h3>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <fieldset class="form-group">
+                            {{ u_form|crispy }}
+                            {{ p_form|crispy }}
+                        </fieldset>
+                        <div class="form-group mt-4">
+                            <button class="btn btn-primary btn-update" type="submit">Update</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in cards
+        const profileCard = document.querySelector('.profile-card');
+        const editCard = document.querySelector('.edit-card');
+        
+        setTimeout(() => {
+            profileCard.classList.add('visible');
+        }, 100);
+        setTimeout(() => {
+            editCard.classList.add('visible');
+        }, 200); // Slight delay for staggered effect
+
+        // Bounce effect on update button
+        const updateBtn = document.querySelector('.btn-update');
+        updateBtn.addEventListener('mouseenter', () => {
+            updateBtn.style.transform = 'scale(1.05) translateY(-2px)';
+        });
+        updateBtn.addEventListener('mouseleave', () => {
+            updateBtn.style.transform = 'scale(1)';
+        });
+    });
+</script>
+{% endblock %}

@@ -3,73 +3,187 @@
 
 {% block title %}Browse Trips - Travel Meetup{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Search Card */
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease;
+        opacity: 0;
+    }
+    .search-card.visible {
+        opacity: 1;
+    }
+    .search-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+    .btn-search {
+        transition: all 0.3s ease;
+    }
+    .btn-search:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Trip Cards */
+    .trip-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    .trip-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .trip-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    }
+    .card-btn {
+        transition: all 0.3s ease;
+    }
+    .card-btn:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination .btn {
+        transition: all 0.3s ease;
+        margin: 0 5px;
+    }
+    .pagination .btn:hover {
+        transform: scale(1.05);
+        background-color: #007bff;
+        color: white;
+    }
+    .pagination .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* General */
+    h1 {
+        color: #343a40;
+        font-weight: 700;
+        text-align: center;
+    }
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1 class="mb-4">Browse Trips</h1>
+<div class="container">
+    <h1 class="mb-5">Browse Trips</h1>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Search Trips</h5>
-        <form method="GET" class="row g-3">
-            <div class="col-md-4">
-                {{ search_form.destination|as_crispy_field }}
-            </div>
-            <div class="col-md-3">
-                {{ search_form.start_date|as_crispy_field }}
-            </div>
-            <div class="col-md-3">
-                {{ search_form.end_date|as_crispy_field }}
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Search</button>
-            </div>
-        </form>
+    <!-- Search Form -->
+    <div class="card mb-5 search-card">
+        <div class="card-body">
+            <h5 class="card-title text-primary">Search Trips</h5>
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    {{ search_form.destination|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ search_form.start_date|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ search_form.end_date|as_crispy_field }}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 btn-search">Search</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    {% for trip in trips %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 trip-card">
-            <div class="card-body">
-                <h5 class="card-title">{{ trip.destination }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    {{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}
-                </h6>
-                <p class="card-text">{{ trip.description|truncatechars:100 }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">Posted by {{ trip.creator.username }}</small>
-                    <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+    <!-- Trip Listings -->
+    <div class="row">
+        {% for trip in trips %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 trip-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ trip.destination }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}
+                    </h6>
+                    <p class="card-text">{{ trip.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Posted by {{ trip.creator.username }}</small>
+                        <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary card-btn">View Details</a>
+                    </div>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No trips found matching your criteria.</p>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="col-12 text-center">
-        <p>No trips found matching your criteria.</p>
-    </div>
-    {% endfor %}
-</div>
 
-<div class="pagination justify-content-center">
+    <!-- Pagination -->
     {% if is_paginated %}
+    <div class="pagination d-flex justify-content-center mt-4">
         {% if page_obj.has_previous %}
-            <a class="btn btn-outline-primary mx-1" href="?page=1{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">First</a>
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.previous_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Previous</a>
+            <a class="btn btn-outline-primary" href="?page=1{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">First</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.previous_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Previous</a>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
-                <a class="btn btn-primary mx-1" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+                <a class="btn btn-primary" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a class="btn btn-outline-primary mx-1" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
+                <a class="btn btn-outline-primary" href="?page={{ num }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.next_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Next</a>
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Last</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.next_page_number }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Next</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">Last</a>
         {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade in search card
+        const searchCard = document.querySelector('.search-card');
+        setTimeout(() => {
+            searchCard.classList.add('visible');
+        }, 100);
+
+        // Slide in trip cards
+        const tripCards = document.querySelectorAll('.trip-card');
+        tripCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('visible');
+            }, 200 + index * 150); // Staggered effect
+        });
+
+        // Bounce effect on buttons
+        const buttons = document.querySelectorAll('.btn-search, .card-btn, .pagination .btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

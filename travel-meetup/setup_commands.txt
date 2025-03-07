@@ -13,7 +13,7 @@ pip install -r requirements.txt
 # Create Django project
 django-admin startproject travel_project .
 
-# Create apps
+# Create apps(if not there)
 python manage.py startapp users
 python manage.py startapp trips
 python manage.py startapp messages_app

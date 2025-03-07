@@ -2,69 +2,199 @@
 
 {% block title %}My Trips - Travel Meetup{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Table */
+    .trip-table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .trip-table.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .table-hover tbody tr {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+    }
+
+    /* Buttons */
+    .btn-action {
+        transition: all 0.3s ease;
+        margin: 0 5px;
+    }
+    .btn-action.btn-outline-primary:hover {
+        background-color: #007bff;
+        color: white;
+        transform: scale(1.05);
+    }
+    .btn-action.btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: scale(1.05);
+    }
+    .btn-action.btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    /* Pagination */
+    .pagination .btn {
+        transition: all 0.3s ease;
+        margin: 0 5px;
+    }
+    .pagination .btn:hover {
+        transform: scale(1.05);
+        background-color: #007bff;
+        color: white;
+    }
+    .pagination .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Alert */
+    .alert-card {
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: scale(0.95);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .alert-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .btn-create {
+        transition: all 0.3s ease;
+    }
+    .btn-create:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* General */
+    h1 {
+        color: #343a40;
+        font-weight: 700;
+        text-align: center;
+    }
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1 class="mb-4">My Trips</h1>
+<div class="container">
+    <h1 class="mb-5">My Trips</h1>
 
-{% if trips %}
-<div class="table-responsive">
-    <table class="table table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Destination</th>
-                <th>Dates</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for trip in trips %}
-            <tr>
-                <td>{{ trip.destination }}</td>
-                <td>{{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}</td>
-                <td>
-                    {% if trip.is_active %}
-                    <span class="badge bg-success">Active</span>
-                    {% else %}
-                    <span class="badge bg-secondary">Past</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary">View</a>
-                    <a href="{% url 'trip-update' trip.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a href="{% url 'trip-delete' trip.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    {% if trips %}
+    <div class="table-responsive">
+        <table class="table table-hover trip-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Destination</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trip in trips %}
+                <tr>
+                    <td>{{ trip.destination }}</td>
+                    <td>{{ trip.start_date|date:"M d, Y" }} - {{ trip.end_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if trip.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Past</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary btn-action">View</a>
+                        <a href="{% url 'trip-update' trip.id %}" class="btn btn-sm btn-outline-secondary btn-action">Edit</a>
+                        <a href="{% url 'trip-delete' trip.id %}" class="btn btn-sm btn-outline-danger btn-action">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<div class="pagination justify-content-center">
+    <!-- Pagination -->
     {% if is_paginated %}
+    <div class="pagination d-flex justify-content-center mt-4">
         {% if page_obj.has_previous %}
-            <a class="btn btn-outline-primary mx-1" href="?page=1">First</a>
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="btn btn-outline-primary" href="?page=1">First</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
-                <a class="btn btn-primary mx-1" href="?page={{ num }}">{{ num }}</a>
+                <a class="btn btn-primary" href="?page={{ num }}">{{ num }}</a>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a class="btn btn-outline-primary mx-1" href="?page={{ num }}">{{ num }}</a>
+                <a class="btn btn-outline-primary" href="?page={{ num }}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a class="btn btn-outline-primary mx-1" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="btn btn-outline-primary" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
         {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info alert-card">
+        <p>You haven't created any trips yet.</p>
+        <a href="{% url 'trip-create' %}" class="btn btn-primary btn-create">Create Your First Trip</a>
+    </div>
     {% endif %}
 </div>
-{% else %}
-<div class="alert alert-info">
-    <p>You haven't created any trips yet.</p>
-    <a href="{% url 'trip-create' %}" class="btn btn-primary">Create Your First Trip</a>
-</div>
-{% endif %}
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and slide in table or alert
+        const table = document.querySelector('.trip-table');
+        const alertCard = document.querySelector('.alert-card');
+        if (table) {
+            setTimeout(() => {
+                table.classList.add('visible');
+            }, 100);
+        }
+        if (alertCard) {
+            setTimeout(() => {
+                alertCard.classList.add('visible');
+            }, 100);
+        }
+
+        // Bounce effect on buttons
+        const buttons = document.querySelectorAll('.btn-action, .btn-create, .pagination .btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}
