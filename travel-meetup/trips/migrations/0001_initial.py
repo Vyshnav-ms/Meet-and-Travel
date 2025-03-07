@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('start_date', models.DateField()),
                 ('end_date', models.DateField()),
                 ('description', models.TextField()),
-                ('image', models.ImageField(blank=True, null=True, upload_to='trip_images/')),
+                ('image', models.ImageField(blank=True, null=True, upload_to='image/')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='trips', to=settings.AUTH_USER_MODEL)),

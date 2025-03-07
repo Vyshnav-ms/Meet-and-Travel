@@ -9,7 +9,7 @@ class Trip(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     description = models.TextField()
-    image = models.ImageField(upload_to='trip_images/', null=True, blank=True)
+    image = models.ImageField(upload_to='trip_images', null=True, blank=True)
   # Optional trip image
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='trips')
     participants = models.ManyToManyField(User, related_name='joined_trips', blank=True)

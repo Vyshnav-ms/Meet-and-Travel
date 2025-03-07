@@ -7,6 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='profile_pics/default.jpg', upload_to='profile_pics')
     bio = models.TextField(max_length=500, blank=True)
+    email = models.EmailField(max_length=254, blank=True)  # Added email field
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -22,13 +23,15 @@ class Profile(models.Model):
                 img.thumbnail(output_size)
                 img.save(self.image.path)
 
-
-# # ✅ Auto-create a profile when a user is created
+# Uncomment and adjust if you want to auto-create profiles
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
+#
 # @receiver(post_save, sender=User)
 # def create_profile(sender, instance, created, **kwargs):
 #     if created:
-#         Profile.objects.create(user=instance)
-
+#         Profile.objects.create(user=instance, email=instance.email)  # Copy User email
+#
 # @receiver(post_save, sender=User)
 # def save_profile(sender, instance, **kwargs):
 #     instance.profile.save()

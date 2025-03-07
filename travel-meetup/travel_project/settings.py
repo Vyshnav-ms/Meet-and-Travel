@@ -91,14 +91,15 @@ TIME_ZONE = 'UTC'  # Consider changing to your local timezone, e.g., 'Asia/Kolka
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, image)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Simplified using Path
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
+# settings.py
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

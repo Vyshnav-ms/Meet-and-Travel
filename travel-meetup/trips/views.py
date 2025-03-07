@@ -38,29 +38,21 @@ class TripListView(ListView):
     paginate_by = 9
     
     def get_queryset(self):
-        # Base queryset: active trips sorted by creation date
-        queryset = Trip.objects.filter(
-            end_date__gte=timezone.now().date()
-        ).order_by('-created_at')
-        
-        # Apply search filters if provided
+        queryset = Trip.objects.filter(end_date__gte=timezone.now().date()).order_by('-created_at')
         form = TripSearchForm(self.request.GET)
         if form.is_valid():
             destination = form.cleaned_data.get('destination')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
-            
             if destination:
                 queryset = queryset.filter(destination__icontains=destination)
             if start_date:
                 queryset = queryset.filter(start_date__gte=start_date)
             if end_date:
                 queryset = queryset.filter(end_date__lte=end_date)
-                
         return queryset
     
     def get_context_data(self, **kwargs):
-        # Add search form to context for template rendering
         context = super().get_context_data(**kwargs)
         context['search_form'] = TripSearchForm(self.request.GET)
         return context
@@ -76,39 +68,69 @@ class UserTripListView(LoginRequiredMixin, ListView):
     paginate_by = 5
     
     def get_queryset(self):
-        return Trip.objects.filter(
-            creator=self.request.user
-        ).order_by('-created_at')
+        return Trip.objects.filter(creator=self.request.user).order_by('-created_at')
 
-class TripDetailView(DetailView):
+class TripDetailView(LoginRequiredMixin, DetailView):
     """
-    Display details of a specific trip.
+    Display details of a specific trip and handle join/leave actions.
     """
     model = Trip
     template_name = 'trips/trip_detail.html'
 
+    def post(self, request, *args, **kwargs):
+        trip = self.get_object()
+        user = request.user
+        
+        if 'join' in request.POST:
+            if user not in trip.participants.all():
+                trip.participants.add(user)
+                messages.success(request, f"You have joined the trip to {trip.destination}!")
+                print(f"{user.username} joined trip {trip.id}")  # Debug
+            else:
+                messages.info(request, "You are already a participant in this trip.")
+        
+        elif 'leave' in request.POST:
+            if user in trip.participants.all():
+                trip.participants.remove(user)
+                messages.success(request, f"You have left the trip to {trip.destination}!")
+                print(f"{user.username} left trip {trip.id}")  # Debug
+            else:
+                messages.info(request, "You are not a participant in this trip.")
+        
+        return redirect('trip-detail', pk=trip.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_participant'] = self.request.user in self.get_object().participants.all()
+        return context
+
 class TripCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new trip, restricted to logged-in users.
-    """
     model = Trip
     form_class = TripForm
     template_name = 'trips/trip_form.html'
     
+    def post(self, request, *args, **kwargs):
+        print("POST Data:", request.POST)
+        print("FILES:", request.FILES)
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            print("Form errors:", form.errors)
+            return self.form_invalid(form)
+    
     def form_valid(self, form):
-        # Assign the current user as the trip creator
         form.instance.creator = self.request.user
+        print("Image before save:", form.instance.image)
         messages.success(self.request, 'Your trip has been created!')
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        print("Image after save:", form.instance.image)
+        return response
     
     def get_success_url(self):
-        # Redirect to the trip's detail page after creation
         return self.object.get_absolute_url()
 
 class TripUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    """
-    Update an existing trip, restricted to the trip's creator.
-    """
     model = Trip
     form_class = TripForm
     template_name = 'trips/trip_form.html'
@@ -119,24 +141,18 @@ class TripUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
     
     def test_func(self):
-        # Ensure only the creator can update the trip
         trip = self.get_object()
         return self.request.user == trip.creator
     
     def get_success_url(self):
-        # Redirect to the trip's detail page after update
         return self.object.get_absolute_url()
 
 class TripDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a trip, restricted to the trip's creator.
-    """
     model = Trip
     template_name = 'trips/trip_confirm_delete.html'
     success_url = '/trips/'
     
     def test_func(self):
-        # Ensure only the creator can delete the trip
         trip = self.get_object()
         return self.request.user == trip.creator
     
