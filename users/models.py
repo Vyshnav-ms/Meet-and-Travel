@@ -8,6 +8,7 @@ class Profile(models.Model):
     image = models.ImageField(default='profile_pics/default.jpg', upload_to='profile_pics')
     bio = models.TextField(max_length=500, blank=True)
     email = models.EmailField(max_length=254, blank=True)  # Added email field
+    aadhaar_number = models.CharField(max_length=12, blank=True, null=True)  # New Aadhaar
 
     def __str__(self):
         return f'{self.user.username} Profile'
