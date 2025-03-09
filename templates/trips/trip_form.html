@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Trip{% else %}Create Trip{% endif %} - Travel Meetup
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Form Card */
+    .form-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .form-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .form-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Buttons */
+    .btn-cancel, .btn-submit {
+        transition: all 0.3s ease;
+    }
+    .btn-cancel:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: scale(1.05);
+    }
+    .btn-submit {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-submit:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* General */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+    }
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card form-card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">
+                        {% if form.instance.pk %}Edit Trip{% else %}Create New Trip{% endif %}
+                    </h2>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if form.instance.pk %}{% url 'trip-detail' form.instance.pk %}{% else %}{% url 'trip-list' %}{% endif %}" class="btn btn-outline-secondary btn-cancel">Cancel</a>
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                {% if form.instance.pk %}Update Trip{% else %}Create Trip{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in form card
+        const formCard = document.querySelector('.form-card');
+        setTimeout(() => {
+            formCard.classList.add('visible');
+        }, 100);
+
+        // Bounce effect on buttons
+        const buttons = document.querySelectorAll('.btn-cancel, .btn-submit');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

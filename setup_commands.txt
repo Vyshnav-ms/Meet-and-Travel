@@ -1,0 +1,30 @@
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create Django project
+django-admin startproject travel_project .
+
+# Create apps(if not there)
+python manage.py startapp users
+python manage.py startapp trips
+python manage.py startapp messages_app
+
+# Create migrations and apply them
+python manage.py makemigrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Run server
+python manage.py runserver
+

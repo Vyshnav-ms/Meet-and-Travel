@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out - Travel Meetup{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Logout Container */
+    .logout-container {
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        padding: 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .logout-container.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .logout-container:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Button */
+    .btn-login {
+        transition: all 0.3s ease;
+        padding: 0.75rem 1.5rem;
+    }
+    .btn-login:hover {
+        background-color: #007bff;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    /* Typography */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    /* General */
+    .container {
+        padding: 5rem 0; /* Increased padding for more vertical space */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center logout-container">
+        <h2>You have been logged out</h2>
+        <div class="border-top pt-3">
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-login">Log In Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in logout container
+        const logoutContainer = document.querySelector('.logout-container');
+        setTimeout(() => {
+            logoutContainer.classList.add('visible');
+        }, 100);
+
+        // Bounce effect on login button
+        const loginBtn = document.querySelector('.btn-login');
+        loginBtn.addEventListener('mouseenter', () => {
+            loginBtn.style.transform = 'scale(1.05) translateY(-2px)';
+        });
+        loginBtn.addEventListener('mouseleave', () => {
+            loginBtn.style.transform = 'scale(1)';
+        });
+    });
+</script>
+{% endblock %}

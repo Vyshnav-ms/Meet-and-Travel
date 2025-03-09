@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Message {{ receiver.username }} - Travel Meetup{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Card */
+    .message-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .message-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .message-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Header */
+    .card-header {
+        background: linear-gradient(90deg, #007bff, #00c4cc);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    .btn-back {
+        transition: all 0.3s ease;
+    }
+    .btn-back:hover {
+        background-color: #ffffff;
+        color: #007bff;
+        transform: scale(1.05);
+    }
+    h5 {
+        font-weight: 700;
+    }
+
+    /* Button */
+    .btn-send {
+        transition: all 0.3s ease;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-send:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* General */
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card message-card">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary btn-back me-3">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        <img src="{{ receiver.profile.image.url }}" alt="{{ receiver.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <h5 class="mb-0">New Message to {{ receiver.username }}</h5>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-send">
+                                <i class="fas fa-paper-plane me-1"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in message card
+        const messageCard = document.querySelector('.message-card');
+        setTimeout(() => {
+            messageCard.classList.add('visible');
+        }, 100);
+
+        // Bounce effect on buttons
+        const buttons = document.querySelectorAll('.btn-back, .btn-send');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

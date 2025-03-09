@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - Travel Meetup{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Register Card */
+    .register-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    .register-card.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .register-card:hover {
+        transform: translateY(-5px) scale(1);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Button */
+    .btn-signup {
+        transition: all 0.3s ease;
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 0.75rem;
+    }
+    .btn-signup:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Typography */
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+    }
+    .text-muted a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .text-muted a:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+    /* General */
+    .container {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card register-card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Join Travel Meetup</h2>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-primary btn-signup" type="submit">Sign Up</button>
+                        </div>
+                    </form>
+                    <div class="border-top pt-3 text-center">
+                        <small class="text-muted">
+                            Already have an account? <a href="{% url 'login' %}">Sign In</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade and scale in register card
+        const registerCard = document.querySelector('.register-card');
+        setTimeout(() => {
+            registerCard.classList.add('visible');
+        }, 100);
+
+        // Bounce effect on sign-up button
+        const signupBtn = document.querySelector('.btn-signup');
+        signupBtn.addEventListener('mouseenter', () => {
+            signupBtn.style.transform = 'scale(1.05) translateY(-2px)';
+        });
+        signupBtn.addEventListener('mouseleave', () => {
+            signupBtn.style.transform = 'scale(1)';
+        });
+    });
+</script>
+{% endblock %}
