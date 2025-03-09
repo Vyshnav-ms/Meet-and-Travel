@@ -1,1 +1,1 @@
-![MentalPal Home](meadia/home.png)
+![Meet=and=Travel Home](media/home.png)
