@@ -20,8 +20,12 @@ Travel Buddy is a web application built using Python and Django that connects tr
 - **Database**: SQLite
 - **Real-Time Communication**: Django Channels, WebSockets
 - **Authentication**: Django Authentication System
+
+
   ![Meet=and=Travel Home](media/home.png)
 
+
+  
 ## Installation & Setup
 
 1. **Clone the Repository**
